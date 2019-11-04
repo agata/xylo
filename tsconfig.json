@@ -1,0 +1,21 @@
+{
+    "compilerOptions": {
+        "target": "esnext",
+        "module": "commonjs",
+        "moduleResolution": "node",
+        "strict": true,
+        "esModuleInterop": true,
+        "skipLibCheck": true,
+        "declaration": true,
+        "pretty": true,
+        "newLine": "lf",
+        "outDir": "lib"
+    },
+    "include": [
+        "src/*",
+    ],
+    "exclude": [
+        "test/*",
+        "node_modules"
+    ]
+}

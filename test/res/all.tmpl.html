@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Test &amp; Demo</title>
+    </head>
+    <body>
+        <img src="logo.png" x-bind:title="message" />
+        <h1 x-text="message">Hello World!</h1>
+        <ul>
+            <li x-for="todo in todos" x-bind:class="todo.done ? 'done' : ''"><span x-if="todo.done">✅</span><span x-text="todo.title">Todo 0</span></li>
+        </ul>
+        <div x-html="description">This is a description.</div>
+    </body>
+</html>

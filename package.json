@@ -1,0 +1,65 @@
+{
+  "name": "xylo",
+  "version": "0.0.1",
+  "description": "Xylo.js is a static generator using pure HTML template like Vue.js.",
+  "author": "Toshitaka Agata",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/agata/xylo.git"
+  },
+  "bugs": {
+    "url": "https://github.com/agata/xylo/issues"
+  },
+  "homepage": "https://github.com/agata/xylo",
+  "keywords": [
+    "static",
+    "site",
+    "generator",
+    "template"
+  ],
+  "main": "lib/index.js",
+  "files": [
+    "lib"
+  ],
+  "scripts": {
+    "test": "jest",
+    "lint": "tslint -c tslint.json 'src/**/*.ts' 'test/**/*.ts'",
+    "build": " -rf lib && mkdir lib && npm run lint && tsc",
+    "prepublishOnly": "npm run build"
+  },
+  "dependencies": {
+    "jexl": "^2.2.2",
+    "parse5": "^5.1.0"
+  },
+  "devDependencies": {
+    "@types/jest": "^24.0.21",
+    "@types/jexl": "^2.1.0",
+    "@types/node": "^12.12.5",
+    "@types/parse5": "^5.0.2",
+    "jest": "^24.9.0",
+    "ts-jest": "^24.1.0",
+    "tslint": "^5.20.0",
+    "typescript": "^3.6.4"
+  },
+  "jest": {
+    "moduleFileExtensions": [
+      "ts",
+      "js"
+    ],
+    "transform": {
+      "^.+\\.ts$": "ts-jest"
+    },
+    "globals": {
+      "ts-jest": {
+        "tsConfig": "tsconfig.json"
+      }
+    },
+    "testMatch": [
+      "**/test/**/*.test.ts"
+    ],
+    "moduleNameMapper": {
+      "^#/(.+)": "<rootDir>/src/$1"
+    }
+  }
+}

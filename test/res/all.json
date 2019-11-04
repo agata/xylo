@@ -1,0 +1,18 @@
+{
+    "message": "<Hello Xylo!>",
+    "description": "Xylo.js is a static generator using <strong>pure HTML template</strong> like Vue.js.",
+    "todos": [
+        {
+            "title": "Todo 1",
+            "done": false
+        },
+        {
+            "title": "Todo 2",
+            "done": true
+        },
+        {
+            "title": "Todo 3",
+            "done": false
+        }
+    ]
+}
