@@ -31,4 +31,21 @@ describe('render', (): void => {
 
         expect(html).toBe(expected);
     });
+    test('error expression', (): void => {
+        const tmpl = `<!DOCTYPE html>
+<html>
+    <body>
+        <a x-attr:href="this is error expression">error</a>
+    </body>
+</html>
+`;
+        const expected = 'a@x-attr:href(Line:4, Col:9) - Error: Token is  (identifier) unexpected in expression: this is ';
+        try {
+            const context = {};
+            generate(tmpl, context);
+            fail('should throw directive error');
+        } catch (e) {
+            expect(e.toString()).toBe(expected);
+        }
+    });
 });
