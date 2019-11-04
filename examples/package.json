@@ -1,0 +1,11 @@
+{
+  "name": "xylo-examples",
+  "scripts": {
+    "hello": "node src/hello.js",
+    "sitegen": "node src/sitegen.js"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "xylo": "0.0.3"
+  }
+}
