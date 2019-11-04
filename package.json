@@ -25,7 +25,7 @@
   "scripts": {
     "test": "jest",
     "lint": "tslint -c tslint.json 'src/**/*.ts' 'test/**/*.ts'",
-    "build": " -rf lib && mkdir lib && npm run lint && tsc",
+    "build": "rm -Rf lib && mkdir lib && npm run lint && tsc",
     "prepublishOnly": "npm run build"
   },
   "dependencies": {
