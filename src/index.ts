@@ -1,5 +1,7 @@
 import { Jexl } from 'jexl';
-import { DefaultTreeElement, DefaultTreeNode, Node, parse, parseFragment, serialize, Attribute } from 'parse5';
+import {
+    Attribute, DefaultTreeElement, DefaultTreeNode, Node, parse, parseFragment, serialize,
+} from 'parse5';
 
 import * as helper from './tree-helper';
 
@@ -25,7 +27,7 @@ const processChildNodes = (parentNode: Node, context: any) => {
             }
         }
     }
-}
+};
 
 const processElement = (node: DefaultTreeElement, context: any) => {
     const clonedAttrs = [...helper.getAttrList(node)];
@@ -34,7 +36,7 @@ const processElement = (node: DefaultTreeElement, context: any) => {
         try {
             const directive = directives.find((d) => d.match(attr));
             if (directive) {
-                let result = directive.process(node, clonedAttrs, attr, context);
+                const result = directive.process(node, clonedAttrs, attr, context);
                 if (result.skipChildNodes) {
                     return;
                 }
@@ -78,7 +80,7 @@ const htmlDirective: Directive = {
         const fragments = helper.getChildNodes(parseFragment(html, PARSE_OPTS));
         helper.replaceChildNodes(node, fragments);
         return {skipChildNodes: false};
-    }
+    },
 };
 
 const textDirective: Directive = {
@@ -91,7 +93,7 @@ const textDirective: Directive = {
         const fragments = helper.getChildNodes(parseFragment(text, PARSE_OPTS));
         helper.replaceChildNodes(node, fragments);
         return {skipChildNodes: false};
-    }
+    },
 };
 
 const attrDirective: Directive = {
@@ -103,7 +105,7 @@ const attrDirective: Directive = {
         const newValue = jexl.evalSync(attr.value, context);
         helper.setAttrValue(attrs, attrName, newValue);
         return {skipChildNodes: false};
-    }
+    },
 };
 
 const ifDirective: Directive = {
@@ -117,7 +119,7 @@ const ifDirective: Directive = {
             return {skipChildNodes: true};
         }
         return {skipChildNodes: false};
-    }
+    },
 };
 
 const forDirective: Directive = {
@@ -156,7 +158,7 @@ const forDirective: Directive = {
             helper.insertChildNodes(parentNode, currentIndex, newNodes);
         }
         return {skipChildNodes: true};
-    }
+    },
 };
 
 const directives = [
