@@ -1,6 +1,7 @@
-import { generate } from '../src/index';
 import { readFileSync } from 'fs';
 import { join } from 'path';
+
+import { generate } from '../src/index';
 
 function readFile(filePath: string): string {
     return readFileSync(
