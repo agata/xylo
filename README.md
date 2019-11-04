@@ -107,7 +107,7 @@ HTML:
 
 Template:
 ```html
-<img src="logo.png" x-bind:message="message"/>
+<img src="logo.png" x-bind:title="message"/>
 ```
 
 Data:
