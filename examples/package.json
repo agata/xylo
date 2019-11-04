@@ -6,6 +6,6 @@
   },
   "license": "MIT",
   "dependencies": {
-    "xylo": "0.0.3"
+    "xylo": "0.0.4"
   }
 }
