@@ -26,6 +26,7 @@
     "test": "jest",
     "lint": "tslint -c tslint.json 'src/**/*.ts' 'test/**/*.ts'",
     "build": "rm -Rf lib && mkdir lib && npm run lint && tsc",
+    "publish": "npm publish --access=public",
     "prepublishOnly": "npm run build"
   },
   "dependencies": {
