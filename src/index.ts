@@ -59,8 +59,8 @@ class Generator {
                 const fragments = getChildNodes(parseFragment(text, PARSE_OPTS));
                 replaceChildNodes(node, fragments);
             }
-            if (attr.name.startsWith('x-bind:')) {
-                const [xBind, attrName] = attr.name.split(':').map((v) => v.trim());
+            if (attr.name.startsWith('x-attr:')) {
+                const [, attrName] = attr.name.split(':').map((v) => v.trim());
                 const newValue = jexl.evalSync(attr.value, context);
                 setAttrValue(clonedAttrs, attrName, newValue);
             }

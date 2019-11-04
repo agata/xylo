@@ -103,11 +103,11 @@ HTML:
 <span>Todo 2</span>
 ```
 
-### x-bind
+### x-attr
 
 Template:
 ```html
-<img src="logo.png" x-bind:title="message"/>
+<img src="logo.png" x-attr:title="message"/>
 ```
 
 Data:
