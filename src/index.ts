@@ -8,14 +8,13 @@ import * as helper from './tree-helper';
 const jexl = new Jexl();
 const PARSE_OPTS = {sourceCodeLocationInfo: true};
 
-export function generate(htmlTemplate: string, data: any): string {
+export function generate(htmlTemplate: string, context: any): string {
     const startNode = parse(htmlTemplate, PARSE_OPTS);
-    const context = data;
     processChildNodes(startNode, context);
     return serialize(startNode);
 }
 
-const processChildNodes = (parentNode: Node, context: any) => {
+function processChildNodes(parentNode: Node, context: any) {
     const cloneChildNodes = [...helper.getChildNodes(parentNode)];
 
     if (cloneChildNodes) {
@@ -27,9 +26,9 @@ const processChildNodes = (parentNode: Node, context: any) => {
             }
         }
     }
-};
+}
 
-const processElement = (node: DefaultTreeElement, context: any) => {
+function processElement(node: DefaultTreeElement, context: any) {
     const clonedAttrs = [...helper.getAttrList(node)];
 
     for (const attr of clonedAttrs) {
@@ -48,9 +47,9 @@ const processElement = (node: DefaultTreeElement, context: any) => {
 
     node.attrs = clonedAttrs.filter((attr) => !attr.name.startsWith('x-'));
     processChildNodes(node, context);
-};
+}
 
-const handleDirectiveError = (e: Error, node: DefaultTreeElement, attr?: Attribute) => {
+function handleDirectiveError(e: Error, node: DefaultTreeElement, attr?: Attribute) {
     let message = node.nodeName;
     if (attr) {
         message += '@' + attr.name;
@@ -60,7 +59,7 @@ const handleDirectiveError = (e: Error, node: DefaultTreeElement, attr?: Attribu
     }
     message += ' - ' + e;
     throw message;
-};
+}
 
 interface Directive {
     match: (attr: Attribute) => boolean;

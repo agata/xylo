@@ -5,61 +5,61 @@ const treeAdapter = defaultTreeAdapter;
 
 // traverse
 
-export const getChildNodes = (node: Node): Node[] => {
+export function getChildNodes(node: Node): Node[] {
     return treeAdapter.getChildNodes(node);
-};
+}
 
-export const isElementNode = (node: Node): boolean => {
+export function isElementNode(node: Node): boolean {
     return treeAdapter.isElementNode(node);
-};
+}
 
-export const getAttrList = (node: Node): Attribute[] => {
+export function getAttrList(node: Node): Attribute[] {
     return treeAdapter.getAttrList(node);
-};
+}
 
-export const getParentNode = (node: Node): Node => {
+export function getParentNode(node: Node): Node {
     return treeAdapter.getParentNode(node);
-};
+}
 
-export const getFirstChild = (node: Node): Node => {
+export function getFirstChild(node: Node): Node {
     return treeAdapter.getFirstChild(node);
-};
+}
 
-export const createElement = (name: string, ns: string): DefaultTreeElement => {
-    return treeAdapter.createElement(name, ns);
-};
-
-export const isBlankTextNode = (node: DefaultTreeNode | undefined): boolean => {
+export function isBlankTextNode(node: DefaultTreeNode | undefined): boolean {
     if (!node || node.nodeName !== '#text') { return false; }
 
     return (node as DefaultTreeTextNode).value.trim().length === 0;
-};
+}
 
-export const getPrevNode = (node: DefaultTreeElement): Node | undefined => {
+export function getPrevNode(node: DefaultTreeElement): Node | undefined {
     const parentNode = node.parentNode;
     if (!parentNode) { return undefined; }
 
     const index = parentNode.childNodes.indexOf(node);
     return parentNode.childNodes[index - 1];
-};
+}
 
 // manipulation
 
-export const appendChild = (parent: Node, child: Node): void => {
+export function createElement(name: string, ns: string): DefaultTreeElement {
+    return treeAdapter.createElement(name, ns);
+}
+
+export function appendChild(parent: Node, child: Node): void {
     treeAdapter.appendChild(parent, child);
-};
+}
 
-export const detachNode = (node: Node): void => {
+export function detachNode(node: Node): void {
     treeAdapter.detachNode(node);
-};
+}
 
-export const replaceChildNodes = (node: Node, newChildNodes: Node[]) => {
+export function replaceChildNodes(node: Node, newChildNodes: Node[]): void {
     const childNodes = getChildNodes(node);
     childNodes.splice(0, childNodes.length);
     newChildNodes.forEach((childNode) => childNodes.push(childNode));
-};
+}
 
-export const setAttrValue = (attrs: Attribute[], name: string, value: string) => {
+export function setAttrValue(attrs: Attribute[], name: string, value: string): void {
     const attr = attrs.find((a) => a.name === name);
     if (attr) {
         if (value) {
@@ -72,11 +72,11 @@ export const setAttrValue = (attrs: Attribute[], name: string, value: string) =>
             attrs.push({name, value});
         }
     }
-};
+}
 
-export const insertChildNodes = (parentNode: DefaultTreeElement, index: number, nodes: DefaultTreeNode[]) => {
+export function insertChildNodes(parentNode: DefaultTreeElement, index: number, nodes: DefaultTreeNode[]): void {
     Array.prototype.splice.apply(parentNode.childNodes, ([index, 0] as any).concat(nodes));
-};
+}
 
 // utils
 
