@@ -6,8 +6,12 @@
     <body>
         <h1>Libraries</h1>
         <ul>
-            <li x-for="lib in libs"><a href="./library.tmpl.html" x-attr:href="'./' + lib.name + '.html'" x-text="lib.name">Lib 1</a></li>
-            <li x-if="false"><a href="library.tmpl.html">Lib 2</a></li>
+            <li x-for="lib in libs">
+                <a href="./library.tmpl.html" x-attr:href="'./' + lib.name + '.html'" x-text="lib.name">Lib 1</a>
+            </li>
+            <li x-if="false">
+                <a href="library.tmpl.html">Lib 2</a>
+            </li>
         </ul>
     </body>
 </html>
