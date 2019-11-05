@@ -35,7 +35,7 @@ function processElement(node: DefaultTreeElement, context: any) {
         try {
             const directive = directives.find((d) => d.match(attr));
             if (directive) {
-                const result = directive.process(node, clonedAttrs, attr, context);
+                const result = directive.process(node, attr, context);
                 if (result.skipChildNodes) {
                     return;
                 }
@@ -45,25 +45,25 @@ function processElement(node: DefaultTreeElement, context: any) {
         }
     }
 
-    node.attrs = clonedAttrs.filter((attr) => !attr.name.startsWith('x-'));
+    node.attrs = helper.getAttrList(node).filter((attr) => !attr.name.startsWith('x-'));
     processChildNodes(node, context);
 }
 
 function handleDirectiveError(e: Error, node: DefaultTreeElement, attr?: Attribute) {
-    let message = node.nodeName;
+    let msg = node.nodeName;
     if (attr) {
-        message += '@' + attr.name;
+        msg += '@' + attr.name;
     }
     if (node.sourceCodeLocation) {
-        message += `(Line:${node.sourceCodeLocation.startLine}, Col:${node.sourceCodeLocation.startCol})`;
+        msg += `(Line:${node.sourceCodeLocation.startLine}, Col:${node.sourceCodeLocation.startCol})`;
     }
-    message += ' - ' + e;
-    throw message;
+    msg += ' - ' + e;
+    throw msg;
 }
 
 interface Directive {
     match: (attr: Attribute) => boolean;
-    process: (node: DefaultTreeElement, attrs: Attribute[], attr: Attribute, context: any) => DirectiveResult;
+    process: (node: DefaultTreeElement, attr: Attribute, context: any) => DirectiveResult;
 }
 
 interface DirectiveResult {
@@ -74,7 +74,7 @@ const htmlDirective: Directive = {
     match(attr: Attribute): boolean {
         return attr.name === 'x-html';
     },
-    process(node: DefaultTreeElement, attrs: Attribute[], attr: Attribute, context: any): DirectiveResult {
+    process(node: DefaultTreeElement, attr: Attribute, context: any): DirectiveResult {
         const html = jexl.evalSync(attr.value, context);
         const fragments = helper.getChildNodes(parseFragment(html, PARSE_OPTS));
         helper.replaceChildNodes(node, fragments);
@@ -86,10 +86,10 @@ const textDirective: Directive = {
     match(attr: Attribute): boolean {
         return attr.name === 'x-text';
     },
-    process(node: DefaultTreeElement, attrs: Attribute[], attr: Attribute, context: any): DirectiveResult {
+    process(node: DefaultTreeElement, attr: Attribute, context: any): DirectiveResult {
         const rawText = jexl.evalSync(attr.value, context);
-        const text = rawText ? helper.escapeString(rawText, false) : '';
-        const fragments = helper.getChildNodes(parseFragment(text, PARSE_OPTS));
+        const safeText = rawText ? helper.escapeString(rawText, false) : '';
+        const fragments = helper.getChildNodes(parseFragment(safeText, PARSE_OPTS));
         helper.replaceChildNodes(node, fragments);
         return {skipChildNodes: false};
     },
@@ -99,8 +99,10 @@ const attrDirective: Directive = {
     match(attr: Attribute): boolean {
         return attr.name.startsWith('x-attr:');
     },
-    process(node: DefaultTreeElement, attrs: Attribute[], attr: Attribute, context: any): DirectiveResult {
+    process(node: DefaultTreeElement, attr: Attribute, context: any): DirectiveResult {
+        const attrs = helper.getAttrList(node);
         const [, attrName] = attr.name.split(':').map((v) => v.trim());
+
         const newValue = jexl.evalSync(attr.value, context);
         helper.setAttrValue(attrs, attrName, newValue);
         return {skipChildNodes: false};
@@ -111,7 +113,7 @@ const ifDirective: Directive = {
     match(attr: Attribute): boolean {
         return attr.name === 'x-if';
     },
-    process(node: DefaultTreeElement, attrs: Attribute[], attr: Attribute, context: any): DirectiveResult {
+    process(node: DefaultTreeElement, attr: Attribute, context: any): DirectiveResult {
         const condtion = jexl.evalSync(attr.value, context);
         if (!condtion) {
             helper.detachNode(node);
@@ -125,33 +127,40 @@ const forDirective: Directive = {
     match(attr: Attribute): boolean {
         return attr.name === 'x-for';
     },
-    process(node: DefaultTreeElement, attrs: Attribute[], attr: Attribute, context: any): DirectiveResult {
+    process(node: DefaultTreeElement, attr: Attribute, context: any): DirectiveResult {
         const parentNode = helper.getParentNode(node) as DefaultTreeElement;
-        const prevNode = helper.getPrevNode(node);
         const currentIndex = parentNode.childNodes.indexOf(node);
-        helper.detachNode(node);
+        const prevNode = helper.getPrevNode(node);
         const [itemName, itemsName] = attr.value.split('in').map((v) => v.trim());
+
+        helper.detachNode(node);
         const items = jexl.evalSync(itemsName, context);
         if (items) {
-            const newItemNodes = Array.from(items).flatMap((item) => {
+            const newItemNodes = Array.from(items).map((item) => {
+                // prepare new context for item
                 const newContext = Object.assign({}, context);
                 newContext[itemName] = item;
+
+                // prepare new node for item
                 const rootElement = helper.createElement('template', node.namespaceURI);
                 helper.appendChild(rootElement, node);
-                const fragments = parseFragment(serialize(rootElement), PARSE_OPTS);
+                const fragments = parseFragment(serialize(rootElement), PARSE_OPTS);                
                 const newItemNode = helper.getFirstChild(fragments) as DefaultTreeElement;
                 newItemNode.attrs = helper.getAttrList(newItemNode).filter((a) => a.name !== 'x-for');
+
                 processElement(newItemNode as DefaultTreeElement, newContext);
-                return [newItemNode];
+
+                return newItemNode;
             });
 
-            // append indent and new line
             const newNodes = [] as DefaultTreeNode[];
             for (let i = 0, cnLength = newItemNodes.length; i < cnLength; i++) {
+                // append node for indent and new line
                 const newNode = newItemNodes[i];
                 if (i !== 0 && helper.isBlankTextNode(prevNode as DefaultTreeNode)) {
                     newNodes.push(Object.assign({}, prevNode) as DefaultTreeNode);
                 }
+
                 newNodes.push(newNode);
             }
             helper.insertChildNodes(parentNode, currentIndex, newNodes);
