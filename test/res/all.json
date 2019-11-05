@@ -1,6 +1,6 @@
 {
     "message": "<Hello Xylo!>",
-    "description": "Xylo.js is a static generator using <strong>pure HTML template</strong> like Vue.js.",
+    "description": "Xylo.js is a static site generator using <strong>pure HTML template</strong> like Vue.js and Thymeleaf.",
     "todos": [
         {
             "title": "Todo 1",

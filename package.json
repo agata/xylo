@@ -1,7 +1,7 @@
 {
   "name": "xylo",
   "version": "0.0.4",
-  "description": "Xylo.js is a static generator using pure HTML template like Vue.js.",
+  "description": "Xylo.js is a static site generator using pure HTML template like Vue.js and Thymeleaf.",
   "author": "Toshitaka Agata",
   "license": "MIT",
   "repository": {

@@ -1,6 +1,6 @@
 # Xylo.js
 
-Xylo.js is a static generator using pure HTML template like Vue.js.
+Xylo.js is a static site generator using pure HTML template like Vue.js and Thymeleaf.
 
 ## Installation
 
@@ -132,13 +132,13 @@ Template:
 Data:
 ```json
 {
-    "description": "Xylo.js is a static generator using <strong>pure HTML template</strong> like Vue.js.",
+    "description": "Xylo.js is a static site generator using <strong>pure HTML template</strong> like Vue.js and Thymeleaf.",
 }
 ```
 
 HTML:
 ```html
-<div>Xylo.js is a static generator using <strong>pure HTML template</strong> like Vue.js.</div>
+<div>Xylo.js is a static site generator using <strong>pure HTML template</strong> like Vue.js and Thymeleaf.</div>
 ```
 
 ## Dependencies
