@@ -36,7 +36,7 @@ function processElement(node: DefaultTreeElement, context: any) {
             const directive = directives.find((d) => d.match(attr));
             if (directive) {
                 const result = directive.process(node, attr, context);
-                if (result.skipChildNodes) {
+                if (result.continue == false) {
                     return;
                 }
             }
@@ -67,7 +67,7 @@ interface Directive {
 }
 
 interface DirectiveResult {
-    skipChildNodes: boolean;
+    continue: boolean;
 }
 
 const htmlDirective: Directive = {
@@ -78,7 +78,7 @@ const htmlDirective: Directive = {
         const html = jexl.evalSync(attr.value, context);
         const fragments = helper.getChildNodes(parseFragment(html, PARSE_OPTS));
         helper.replaceChildNodes(node, fragments);
-        return {skipChildNodes: false};
+        return {continue: true};
     },
 };
 
@@ -91,7 +91,7 @@ const textDirective: Directive = {
         const safeText = rawText ? helper.escapeString(rawText, false) : '';
         const fragments = helper.getChildNodes(parseFragment(safeText, PARSE_OPTS));
         helper.replaceChildNodes(node, fragments);
-        return {skipChildNodes: false};
+        return {continue: true};
     },
 };
 
@@ -105,7 +105,7 @@ const attrDirective: Directive = {
 
         const newValue = jexl.evalSync(attr.value, context);
         helper.setAttrValue(attrs, attrName, newValue);
-        return {skipChildNodes: false};
+        return {continue: true};
     },
 };
 
@@ -117,9 +117,9 @@ const ifDirective: Directive = {
         const condtion = jexl.evalSync(attr.value, context);
         if (!condtion) {
             helper.detachNode(node);
-            return {skipChildNodes: true};
+            return {continue: false};
         }
-        return {skipChildNodes: false};
+        return {continue: true};
     },
 };
 
@@ -165,7 +165,7 @@ const forDirective: Directive = {
             }
             helper.insertChildNodes(parentNode, currentIndex, newNodes);
         }
-        return {skipChildNodes: true};
+        return {continue: false};
     },
 };
 
