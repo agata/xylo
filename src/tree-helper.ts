@@ -17,6 +17,10 @@ export function getAttrList(node: Node): Attribute[] {
     return treeAdapter.getAttrList(node);
 }
 
+export function findAttr(attrs: Attribute[], name: string): Attribute | undefined {
+    return attrs.find((attr) => attr.name === name);
+}
+
 export function getParentNode(node: Node): Node {
     return treeAdapter.getParentNode(node);
 }
@@ -71,6 +75,13 @@ export function setAttrValue(attrs: Attribute[], name: string, value: string): v
         if (value) {
             attrs.push({name, value});
         }
+    }
+}
+
+export function removeAttr(attrs: Attribute[], name: string): void {
+    const attr = attrs.find((a) => a.name === name);
+    if (attr) {
+        attrs.splice(attrs.indexOf(attr), 1);
     }
 }
 

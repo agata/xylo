@@ -36,7 +36,7 @@ function processElement(node: DefaultTreeElement, context: any) {
             const directive = directives.find((d) => d.match(attr));
             if (directive) {
                 const result = directive.process(node, attr, context);
-                if (result.continue == false) {
+                if (result.continue === false) {
                     return;
                 }
             }
@@ -44,8 +44,6 @@ function processElement(node: DefaultTreeElement, context: any) {
             handleDirectiveError(e, node, attr);
         }
     }
-
-    node.attrs = helper.getAttrList(node).filter((attr) => !attr.name.startsWith('x-'));
     processChildNodes(node, context);
 }
 
@@ -61,12 +59,12 @@ function handleDirectiveError(e: Error, node: DefaultTreeElement, attr?: Attribu
     throw msg;
 }
 
-interface Directive {
+export interface Directive {
     match: (attr: Attribute) => boolean;
     process: (node: DefaultTreeElement, attr: Attribute, context: any) => DirectiveResult;
 }
 
-interface DirectiveResult {
+export interface DirectiveResult {
     continue: boolean;
 }
 
@@ -78,6 +76,7 @@ const htmlDirective: Directive = {
         const html = jexl.evalSync(attr.value, context);
         const fragments = helper.getChildNodes(parseFragment(html, PARSE_OPTS));
         helper.replaceChildNodes(node, fragments);
+        helper.removeAttr(node.attrs, attr.name);
         return {continue: true};
     },
 };
@@ -91,6 +90,7 @@ const textDirective: Directive = {
         const safeText = rawText ? helper.escapeString(rawText, false) : '';
         const fragments = helper.getChildNodes(parseFragment(safeText, PARSE_OPTS));
         helper.replaceChildNodes(node, fragments);
+        helper.removeAttr(node.attrs, attr.name);
         return {continue: true};
     },
 };
@@ -105,6 +105,7 @@ const attrDirective: Directive = {
 
         const newValue = jexl.evalSync(attr.value, context);
         helper.setAttrValue(attrs, attrName, newValue);
+        helper.removeAttr(node.attrs, attr.name);
         return {continue: true};
     },
 };
@@ -119,6 +120,7 @@ const ifDirective: Directive = {
             helper.detachNode(node);
             return {continue: false};
         }
+        helper.removeAttr(node.attrs, attr.name);
         return {continue: true};
     },
 };
@@ -144,7 +146,7 @@ const forDirective: Directive = {
                 // prepare new node for item
                 const rootElement = helper.createElement('template', node.namespaceURI);
                 helper.appendChild(rootElement, node);
-                const fragments = parseFragment(serialize(rootElement), PARSE_OPTS);                
+                const fragments = parseFragment(serialize(rootElement), PARSE_OPTS);
                 const newItemNode = helper.getFirstChild(fragments) as DefaultTreeElement;
                 newItemNode.attrs = helper.getAttrList(newItemNode).filter((a) => a.name !== 'x-for');
 
@@ -176,3 +178,11 @@ const directives = [
     ifDirective,
     forDirective,
 ];
+
+export const testDirectives = {
+    attr: attrDirective,
+    for: forDirective,
+    html: htmlDirective,
+    if: ifDirective,
+    text: textDirective,
+};
