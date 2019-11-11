@@ -1,5 +1,7 @@
 # Xylo.js
 
+![CI Status](https://github.com/agata/xylo/workflows/CI/badge.svg)
+
 Xylo.js is a static site generator using pure HTML template like Vue.js and Thymeleaf.
 
 ## Installation
