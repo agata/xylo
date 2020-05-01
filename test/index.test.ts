@@ -174,11 +174,27 @@ describe('directives', (): void => {
             expectedResult,
         );
     });
-    test('forDrective: empty items', (): void => {
+    test('forDrective: string items', (): void => {
         const directive = testDirectives.for;
-        const tmpl = '<li x-for="item in items"><span x-text="item.name">text</span></li>';
-        const expectedHtml = '';
-        const context = { items: [] };
+        const tmpl = '<li x-for="item in items" x-text="item">text</li>';
+        const expectedHtml = '<li>a</li><li>b</li><li>c</li>';
+        const context = { items: ['a', 'b', 'c'] };
+        const tagName = 'x-for';
+        const expectedResult = { continue: false } as DirectiveResult;
+        testDirective(
+            directive,
+            tmpl,
+            tagName,
+            context,
+            expectedHtml,
+            expectedResult,
+        );
+    });
+    test('forDrective: filter', (): void => {
+        const directive = testDirectives.for;
+        const tmpl = '<li x-for="item in items[.name == \'1\']"><span x-text="item.name">text</span></li>';
+        const expectedHtml = '<li><span>1</span></li>';
+        const context = { items: [{name: '1'}, {name: '2'}, {name: '3'}] };
         const tagName = 'x-for';
         const expectedResult = { continue: false } as DirectiveResult;
         testDirective(
