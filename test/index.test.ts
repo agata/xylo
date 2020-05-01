@@ -1,9 +1,7 @@
 import { readFileSync } from 'fs';
-import {
-    DefaultTreeElement, parseFragment, serialize,
-} from 'parse5';
+import { Jexl } from 'jexl';
+import { DefaultTreeElement, parseFragment, serialize } from 'parse5';
 import { join } from 'path';
-
 import { Directive, DirectiveResult, generate, testDirectives } from '../src/index';
 import * as helper from '../src/tree-helper';
 
@@ -47,7 +45,20 @@ describe('generate', (): void => {
             expect(e.toString()).toBe(expected);
         }
     });
+    test('override jexl', (): void => {
+        const tmpl = `<html><head></head><body><ul><li x-for="item in items|split(' ')" x-text="item"></li></ul></body></html>`;
+        const expected = `<html><head></head><body><ul><li>A</li><li>B</li><li>C</li></ul></body></html>`;
+        const jexl = new Jexl();
+        jexl.addTransform('split', (val, sep) => val.split(sep));
+        const context = {
+            items: 'A B C'
+        };
+        const html = generate(tmpl, context, jexl);
+
+        expect(html).toBe(expected);
+    });
 });
+
 
 describe('directives', (): void => {
     const testDirective = (
@@ -65,7 +76,7 @@ describe('directives', (): void => {
         if (attr) {
             expect(directive.match(attr)).toBe(true);
 
-            const result = directive.process(topNode, attr, context);
+            const result = directive.process(topNode, attr, context, new Jexl());
             expect(result.continue).toBe(expectedResult.continue);
 
             const rootElement = helper.createElement('template', topNode.namespaceURI);

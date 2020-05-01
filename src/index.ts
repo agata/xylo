@@ -5,16 +5,15 @@ import {
 
 import * as helper from './tree-helper';
 
-const jexl = new Jexl();
 const PARSE_OPTS = {sourceCodeLocationInfo: true};
 
-export function generate(htmlTemplate: string, context: any): string {
+export function generate(htmlTemplate: string, context: any, jexl: any = new Jexl()): string {
     const startNode = parse(htmlTemplate, PARSE_OPTS);
-    processChildNodes(startNode, context);
+    processChildNodes(startNode, context, jexl);
     return serialize(startNode);
 }
 
-function processChildNodes(parentNode: Node, context: any) {
+function processChildNodes(parentNode: Node, context: any, jexl: any) {
     const cloneChildNodes = [...helper.getChildNodes(parentNode)];
 
     if (cloneChildNodes) {
@@ -22,20 +21,20 @@ function processChildNodes(parentNode: Node, context: any) {
             const currentNode = cloneChildNodes[i];
 
             if (helper.isElementNode(currentNode)) {
-                processElement(currentNode as DefaultTreeElement, context);
+                processElement(currentNode as DefaultTreeElement, context, jexl);
             }
         }
     }
 }
 
-function processElement(node: DefaultTreeElement, context: any) {
+function processElement(node: DefaultTreeElement, context: any, jexl: any) {
     const clonedAttrs = [...helper.getAttrList(node)];
 
     for (const attr of clonedAttrs) {
         try {
             const directive = directives.find((d) => d.match(attr));
             if (directive) {
-                const result = directive.process(node, attr, context);
+                const result = directive.process(node, attr, context, jexl);
                 if (result.continue === false) {
                     return;
                 }
@@ -44,7 +43,7 @@ function processElement(node: DefaultTreeElement, context: any) {
             handleDirectiveError(e, node, attr);
         }
     }
-    processChildNodes(node, context);
+    processChildNodes(node, context, jexl);
 }
 
 function handleDirectiveError(e: Error, node: DefaultTreeElement, attr?: Attribute) {
@@ -61,7 +60,7 @@ function handleDirectiveError(e: Error, node: DefaultTreeElement, attr?: Attribu
 
 export interface Directive {
     match: (attr: Attribute) => boolean;
-    process: (node: DefaultTreeElement, attr: Attribute, context: any) => DirectiveResult;
+    process: (node: DefaultTreeElement, attr: Attribute, context: any, jexl: any) => DirectiveResult;
 }
 
 export interface DirectiveResult {
@@ -72,7 +71,7 @@ const htmlDirective: Directive = {
     match(attr: Attribute): boolean {
         return attr.name === 'x-html';
     },
-    process(node: DefaultTreeElement, attr: Attribute, context: any): DirectiveResult {
+    process(node: DefaultTreeElement, attr: Attribute, context: any, jexl: any): DirectiveResult {
         const html = jexl.evalSync(attr.value, context);
         const fragments = helper.getChildNodes(parseFragment(html, PARSE_OPTS));
         helper.replaceChildNodes(node, fragments);
@@ -85,7 +84,7 @@ const textDirective: Directive = {
     match(attr: Attribute): boolean {
         return attr.name === 'x-text';
     },
-    process(node: DefaultTreeElement, attr: Attribute, context: any): DirectiveResult {
+    process(node: DefaultTreeElement, attr: Attribute, context: any, jexl: any): DirectiveResult {
         const rawText = jexl.evalSync(attr.value, context);
         const safeText = rawText ? helper.escapeString(rawText, false) : '';
         const fragments = helper.getChildNodes(parseFragment(safeText, PARSE_OPTS));
@@ -99,7 +98,7 @@ const attrDirective: Directive = {
     match(attr: Attribute): boolean {
         return attr.name.startsWith('x-attr:');
     },
-    process(node: DefaultTreeElement, attr: Attribute, context: any): DirectiveResult {
+    process(node: DefaultTreeElement, attr: Attribute, context: any, jexl: any): DirectiveResult {
         const attrs = helper.getAttrList(node);
         const [, attrName] = attr.name.split(':').map((v) => v.trim());
 
@@ -114,7 +113,7 @@ const ifDirective: Directive = {
     match(attr: Attribute): boolean {
         return attr.name === 'x-if';
     },
-    process(node: DefaultTreeElement, attr: Attribute, context: any): DirectiveResult {
+    process(node: DefaultTreeElement, attr: Attribute, context: any, jexl: any): DirectiveResult {
         const condtion = jexl.evalSync(attr.value, context);
         if (!condtion) {
             helper.detachNode(node);
@@ -129,7 +128,7 @@ const forDirective: Directive = {
     match(attr: Attribute): boolean {
         return attr.name === 'x-for';
     },
-    process(node: DefaultTreeElement, attr: Attribute, context: any): DirectiveResult {
+    process(node: DefaultTreeElement, attr: Attribute, context: any, jexl: any): DirectiveResult {
         const parentNode = helper.getParentNode(node) as DefaultTreeElement;
         const currentIndex = parentNode.childNodes.indexOf(node);
         const prevNode = helper.getPrevNode(node);
@@ -150,7 +149,7 @@ const forDirective: Directive = {
                 const newItemNode = helper.getFirstChild(fragments) as DefaultTreeElement;
                 newItemNode.attrs = helper.getAttrList(newItemNode).filter((a) => a.name !== 'x-for');
 
-                processElement(newItemNode as DefaultTreeElement, newContext);
+                processElement(newItemNode as DefaultTreeElement, newContext, jexl);
 
                 return newItemNode;
             });

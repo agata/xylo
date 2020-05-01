@@ -144,6 +144,22 @@ HTML:
 <div>Xylo.js is a static site generator using <strong>pure HTML template</strong> like Vue.js and Thymeleaf.</div>
 ```
 
+## Advanced usage
+
+### Use a customized Jexl
+
+You can use a customized [Jexl](https://github.com/TomFrost/Jexl).
+
+```js
+const { generate } = require('xylo');
+const template = '<html><head></head><body><ul><li x-for="item in items|split(' ')" x-text="item"></li></ul></body></html>';
+const data = {items: 'A B C'};
+const jexl = new jexl.Jexl();
+jexl.addTransform('split', (val, sep) => val.split(sep));
+const html = generate(template, data, jaxl);
+console.log(html); // `<html><head></head><body><ul><li>A</li><li>B</li><li>C</li></ul></body></html>`
+```
+
 ## Dependencies
 
 * [parse5](https://github.com/inikulin/parse5) - HTML parsing/serialization toolset for Node.js. WHATWG HTML Living Standard (aka HTML5)-compliant.
