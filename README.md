@@ -10,6 +10,7 @@ Install from npm:
 
     npm install xylo
 
+Node.js 12 or higher is required.
 
 ## Basic usage
 
